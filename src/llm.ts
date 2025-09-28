@@ -1,35 +1,14 @@
-import { zodFunction } from 'openai/helpers/zod'
-import { z } from 'zod'
-import type { AIMessage } from '../types'
-import { openai } from './ai'
-import { systemPrompt } from './systemPrompt'
+import perplexity from './ai';
+import type { ChatMessageInput } from '@perplexity-ai/perplexity_ai/resources';
 
 export const runLLM = async ({
-  model = 'gpt-4o-mini',
+  model = 'sonar-pro',
   messages,
-  temperature = 0.1,
-  tools,
 }: {
-  messages: AIMessage[]
-  temperature?: number
-  model?: string
-  tools?: { name: string; parameters: z.AnyZodObject }[]
-}) => {
-  const formattedTools = tools?.map((tool) => zodFunction(tool))
-  const response = await openai.chat.completions.create({
+  model?: string;
+  messages: ChatMessageInput[];
+}) =>
+  await perplexity.chat.completions.create({
     model,
-    messages: [
-      {
-        role: 'system',
-        content: systemPrompt,
-      },
-      ...messages,
-    ],
-    temperature,
-    tools: formattedTools,
-    tool_choice: 'auto',
-    parallel_tool_calls: false,
-  })
-
-  return response.choices[0].message
-}
+    messages,
+  });

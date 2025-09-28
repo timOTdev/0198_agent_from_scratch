@@ -1,3 +1,8 @@
-import OpenAI from 'openai'
+import Perplexity from '@perplexity-ai/perplexity_ai';
 
-export const openai = new OpenAI()
+// Initialize client with explicit API key
+const perplexity: Perplexity = new Perplexity({
+  apiKey: process.env.PERPLEXITY_API_KEY,
+});
+
+export default perplexity;
