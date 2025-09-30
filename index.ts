@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { runLLM } from './src/llm';
+import { addMessages, getMessages } from './src/memory';
 
 const userMessage = process.argv[2];
 
@@ -8,15 +9,28 @@ if (!userMessage) {
   process.exit(1);
 }
 
-// Run the LLM with the user message
+// Save the new user message
+await addMessages([{ role: 'user', content: userMessage }]);
+
+// Load previous messages from memory including user new message
+const messages = await getMessages();
+
+// Run the LLM with all the messages in memory
 const response = await runLLM({
-  messages: [{ role: 'user', content: userMessage }],
+  messages,
 });
 
+// Save the assistant response to memory
+await addMessages([
+  {
+    role: 'assistant',
+    content: response.choices[0].message.content,
+  },
+]);
+
+// > npm start "hi"
 //===============================
-// npm start "hi"
 console.log(response.choices[0].message.content);
-// console.log(response.choices[0].message.content)
 // **Hi** is a common, informal greeting used to say "hello" in English[1][2][5]. It is more casual than "hello" and is appropriate in most everyday situations, except those that require formal language[1][2].
 
 // The term "hi" originated as a variant of "hey" or "hy," and its first recorded use in American English comes from the speech of a Kansas Indigenous person in 1862[4]. Besides greeting, "hi" can also be an exclamation to attract attention[2][4].
@@ -29,9 +43,9 @@ console.log(response.choices[0].message.content);
 
 // In summary, "hi" is most typically recognized worldwide as an informal way to greet someone in English[1][2][5].
 
+// > npm start "hello"
 //===============================
-// npm start "hello"
-console.log(response);
+// console.log(response);
 // {
 //   id: 'c4cafb3d-90ee-4878-9516-06b6342ad768',
 //   model: 'sonar-pro',
